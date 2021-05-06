@@ -1,0 +1,32 @@
+{
+    "name": "boringsearch/meilisearch",
+    "type": "library",
+    "description": "The MeiliSearch component of BoringSearch",
+    "homepage": "https://github.com/BoringSearch",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yanick Witschi",
+            "homepage": "https://github.com/toflar"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "doctrine/dbal": "^3.0",
+        "meilisearch/meilisearch-php": "^0.17.0"
+    },
+    "require-dev": {
+        "symfony/http-client": "^5.2",
+        "nyholm/psr7": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "BoringSearch\\MeiliSearch\\": "src/"
+        }
+    },
+    "support": {
+        "issues": "https://github.com/BoringSearch/BoringSearch/issues",
+        "source": "https://github.com/BoringSearch/BoringSearch",
+        "docs": "https://github.com/BoringSearch/BoringSearch"
+    }
+}
