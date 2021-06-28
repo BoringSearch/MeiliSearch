@@ -23,6 +23,8 @@ use BoringSearch\Core\Index\Result\AsynchronousResultInterface;
 use BoringSearch\Core\Index\Result\ResultInterface;
 use BoringSearch\Core\Index\Result\SynchronousResult;
 use BoringSearch\Core\Query\QueryInterface;
+use BoringSearch\Core\Query\Result\Highlight;
+use BoringSearch\Core\Query\Result\HighlightCollection;
 use BoringSearch\Core\Query\Result\QueryResult;
 use BoringSearch\Core\Query\Result\QueryResultInterface;
 use BoringSearch\Core\Query\Result\Result;
@@ -46,9 +48,13 @@ class Index extends AbstractIndex implements AsynchronousResultsIndexInterface
     public function query(QueryInterface $query): QueryResultInterface
     {
         $attributesToRetrieve = $query->getAttributeNamesToRetrieve();
+        $attributesToHighlight = $query->getAttributesToHighlight();
 
         if ([] === $attributesToRetrieve) {
             $attributesToRetrieve = ['*'];
+        }
+        if ([] === $attributesToHighlight) {
+            $attributesToHighlight = ['*'];
         }
 
         // Make sure we always retrieve the id
@@ -58,12 +64,24 @@ class Index extends AbstractIndex implements AsynchronousResultsIndexInterface
             'limit' => $query->getLimit(),
             'offset' => $query->getOffset(),
             'attributesToRetrieve' => $attributesToRetrieve,
+            'attributesToHighlight' => $attributesToHighlight,
+            'matches' => true,
         ]);
 
         $results = [];
 
         foreach ($searchResult as $result) {
-            $results[] = new Result($this->createDocumentFromResult($result));
+            $highlights = new HighlightCollection();
+
+            if (array_key_exists('_matchesInfo', $result)) {
+                foreach ($result['_matchesInfo'] as $attributeName => $matchesInfo) {
+                    foreach ($matchesInfo as $info) {
+                        $highlights->add(new Highlight($attributeName, $info['start'], $info['length']));
+                    }
+                }
+            }
+
+            $results[] = new Result($this->createDocumentFromResult($result), $highlights);
         }
 
         return new QueryResult($query, new ResultCollection($results), $searchResult->getHitsCount(), $searchResult->getExhaustiveNbHits());
