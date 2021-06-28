@@ -26,6 +26,7 @@ use BoringSearch\Core\Query\QueryInterface;
 use BoringSearch\Core\Query\Result\QueryResult;
 use BoringSearch\Core\Query\Result\QueryResultInterface;
 use BoringSearch\Core\Query\Result\Result;
+use BoringSearch\Core\Query\Result\ResultCollection;
 use BoringSearch\MeiliSearch\Adapter\MeiliSearch;
 use MeiliSearch\Client;
 use MeiliSearch\Endpoints\Indexes;
@@ -59,13 +60,13 @@ class Index extends AbstractIndex implements AsynchronousResultsIndexInterface
             'attributesToRetrieve' => $attributesToRetrieve,
         ]);
 
-        $matches = [];
+        $results = [];
 
         foreach ($searchResult as $result) {
-            $matches[] = new Result($this->createDocumentFromResult($result));
+            $results[] = new Result($this->createDocumentFromResult($result));
         }
 
-        return new QueryResult($query, $matches, $searchResult->getHitsCount(), $searchResult->getExhaustiveNbHits());
+        return new QueryResult($query, new ResultCollection($results), $searchResult->getHitsCount(), $searchResult->getExhaustiveNbHits());
     }
 
     public function findByIdentifier(string $identifier): ?DocumentInterface
