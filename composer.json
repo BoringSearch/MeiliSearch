@@ -13,8 +13,7 @@
     "require": {
         "php": "^8.0",
         "boringsearch/core": "self.version",
-        "doctrine/dbal": "^3.0",
-        "meilisearch/meilisearch-php": "^0.17.0"
+        "meilisearch/meilisearch-php": "^0.21.0"
     },
     "require-dev": {
         "symfony/http-client": "^5.2",

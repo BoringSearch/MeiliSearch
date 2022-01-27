@@ -73,7 +73,7 @@ class Index extends AbstractIndex implements AsynchronousResultsIndexInterface
         foreach ($searchResult as $result) {
             $highlights = new HighlightCollection();
 
-            if (array_key_exists('_matchesInfo', $result)) {
+            if (\array_key_exists('_matchesInfo', $result)) {
                 foreach ($result['_matchesInfo'] as $attributeName => $matchesInfo) {
                     foreach ($matchesInfo as $info) {
                         $highlights->add(new Highlight($attributeName, $info['start'], $info['length']));
@@ -100,19 +100,19 @@ class Index extends AbstractIndex implements AsynchronousResultsIndexInterface
     {
         $result = $this->getIndex()->deleteDocuments($identifiers);
 
-        return new AsynchronousResult(true, (string) $result['updateId']);
+        return new AsynchronousResult(true, (string) $result['uid']);
     }
 
     public function doPurge(): AsynchronousResultInterface
     {
         $result = $this->getIndex()->deleteAllDocuments();
 
-        return new AsynchronousResult(true, (string) $result['updateId']);
+        return new AsynchronousResult(true, (string) $result['uid']);
     }
 
     public function waitForAsynchronousResult(AsynchronousResultInterface $asynchronousResult): ResultInterface
     {
-        $result = $this->getIndex()->waitForPendingUpdate((int) $asynchronousResult->getTaskIdentifier());
+        $result = $this->getIndex()->waitForTask((int) $asynchronousResult->getTaskIdentifier());
 
         if ('processed' === $result['status']) {
             return new SynchronousResult(true);
@@ -136,7 +136,7 @@ class Index extends AbstractIndex implements AsynchronousResultsIndexInterface
 
         $result = $this->getIndex()->addDocuments($data);
 
-        return new AsynchronousResult(true, (string) $result['updateId']);
+        return new AsynchronousResult(true, (string) $result['uid']);
     }
 
     private function createDocumentFromResult(array $result): DocumentInterface
@@ -156,6 +156,6 @@ class Index extends AbstractIndex implements AsynchronousResultsIndexInterface
 
     private function getIndex(): Indexes
     {
-        return $this->client->getOrCreateIndex($this->getName());
+        return $this->client->index($this->getName());
     }
 }
